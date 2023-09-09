@@ -1,5 +1,3 @@
-pillow_heif
-shutil
-tempfile
-streamlit
+pillow_heif==0.13.0
+
 
