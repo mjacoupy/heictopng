@@ -11,6 +11,7 @@ from PIL import Image
 import pillow_heif
 import shutil
 import tempfile
+import zipfile
 
 def convert_heic_to_png(uploaded_files):
     temp_dir = tempfile.mkdtemp()
@@ -40,7 +41,18 @@ def convert_heic_to_png(uploaded_files):
 
             st.write(f"{file_name} a été converti en {png_name}")
 
+    # Afficher les fichiers dans le dossier output_folder
+    for root, dirs, files in os.walk(output_folder):
+        for file in files:
+            st.write(os.path.join(root, file))
+
     return output_folder
+
+def make_zip(source_folder, output_filename):
+    with zipfile.ZipFile(output_filename, 'w') as zipf:
+        for root, dirs, files in os.walk(source_folder):
+            for file in files:
+                zipf.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), source_folder))
 
 st.title("Convertisseur d'images HEIC en PNG")
 
@@ -49,5 +61,5 @@ uploaded_files = st.file_uploader("Glissez et déposez vos images HEIC ici", typ
 if uploaded_files:
     if st.button("Convertir"):
         output_folder = convert_heic_to_png(uploaded_files)
-        shutil.make_archive(output_folder, 'zip', output_folder)
+        make_zip(output_folder, output_folder + ".zip")
         st.download_button("Télécharger les images converties", output_folder + ".zip", "images_converted.zip")
